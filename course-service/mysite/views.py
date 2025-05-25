@@ -52,6 +52,18 @@ class CourseListView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+class CourseGetViewAdmin(APIView):
+     def get(self, request):
+        courses = Course.objects.filter(tenant=request.tenant).order_by('-created_at')
+
+        paginator = CoursePagination()
+        paginated_courses = paginator.paginate_queryset(courses, request)
+
+        serializer = CourseSerializer(paginated_courses, many=True , context={'request': request})
+        return paginator.get_paginated_response(serializer.data)
+
+
 class CourseCreateView(APIView):
 
 
