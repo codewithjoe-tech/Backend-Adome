@@ -15,6 +15,7 @@ from datetime import timedelta
 from django.db.models.functions import TruncMonth
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from django.db.models import Q
 
 
 class CoursePagination(PageNumberPagination):
@@ -25,15 +26,30 @@ class CourseListView(APIView):
     permission_classes = []
 
     def get(self, request):
-        courses = Course.objects.filter(tenant=request.tenant).order_by('-created_at')
+        try:
+            paginator = PageNumberPagination()
+            paginator.page_size = 12
 
-        paginator = CoursePagination()
-        paginated_courses = paginator.paginate_queryset(courses, request)
+            search = request.query_params.get('search', None)
+            tenant = request.tenant
 
-        serializer = CourseSerializer(paginated_courses, many=True , context={'request': request})
-        return paginator.get_paginated_response(serializer.data)
+            if search:
+                courses = Course.objects.filter(
+                    Q(title__icontains=search) |
+                    Q(content__icontains=search),
+                    tenant=tenant,published=True
+                ).order_by('-created_at')
+            else:
+                courses = Course.objects.filter(
+                    tenant=tenant,published=True
+                ).order_by('-created_at')
 
+            paged_data = paginator.paginate_queryset(courses, request)
+            serializer = CourseSerializer(paged_data, many=True, context={'request': request})
+            return paginator.get_paginated_response(serializer.data)
 
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CourseCreateView(APIView):
@@ -295,3 +311,34 @@ class CourseBoughtAnalytics(APIView):
        
         serializer = OwnedCourseAnalyticalSerializer(owned_courses , many=True)
         return Response(serializer.data , status=200)
+    
+
+
+
+class SearchCoursesView(APIView):
+   
+    def get(self, request):
+        try:
+            paginator = PageNumberPagination()
+            paginator.page_size = 12
+
+            search = request.query_params.get('search', None)
+            tenant = request.tenant
+
+            if search:
+                courses = Course.objects.filter(
+                    Q(title__icontains=search) |
+                    Q(content__icontains=search),
+                    tenant=tenant
+                ).order_by('-created_at')
+            else:
+                courses = Course.objects.filter(
+                    tenant=tenant
+                ).order_by('-created_at')
+
+            paged_data = paginator.paginate_queryset(courses, request)
+            serializer = CourseSerializer(paged_data, many=True, context={'request': request})
+            return paginator.get_paginated_response(serializer.data)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
