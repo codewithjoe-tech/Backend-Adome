@@ -18,7 +18,8 @@ urlpatterns = [
     path('my-courses' , MyCoursesView.as_view()),
     path('course-sales' , AllCoursesSalesView.as_view()),
     path('course-six-month' , SixMonthsCourseSales.as_view()),
-    path('course-bought' ,CourseBoughtAnalytics.as_view() )
+    path('course-bought' ,CourseBoughtAnalytics.as_view() ),
+    path('admin-course-get' , CourseGetViewAdmin.as_view())
 ]
 
 
