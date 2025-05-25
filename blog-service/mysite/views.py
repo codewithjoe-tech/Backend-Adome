@@ -4,7 +4,7 @@ from rest_framework import status
 from app.models import *
 from .serializers import *
 from rest_framework.pagination import PageNumberPagination
-
+from django.db.models import Q
 
 
 class BlogPagination(PageNumberPagination):
@@ -15,9 +15,20 @@ class BlogView(APIView):
     authentication_classes = []
     permission_classes  = []
     def get(self, request):
-      
+        search_query = request.GET.get("search", "").strip()
 
-        blogs = Blog.objects.filter(tenant=request.tenant, published=True)
+        blogs = Blog.objects.filter(
+            tenant=request.tenant,
+            published=True
+        )
+
+        if search_query:
+            blogs = blogs.filter(
+                Q(title__icontains=search_query) |
+                Q(content__icontains=search_query),
+                published = True
+            )
+
         paginator = BlogPagination()
         paginated_blogs = paginator.paginate_queryset(blogs, request)
 
