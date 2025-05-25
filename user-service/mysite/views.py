@@ -221,7 +221,7 @@ class LoginView(APIView):
 
             
 
-            response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :str(access_token) , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
+            response = Response({'app':app.subdomain if app else "public" , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
             response.set_cookie(f'{request.tenant.subdomain}_refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True  , expires=refresh_expiry)
             response.set_cookie(key=f'{request.tenant.subdomain}_access_token', expires=refresh_expiry, value = str(access_token), secure=True , httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
