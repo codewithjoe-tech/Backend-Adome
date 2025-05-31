@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+RAZORPAY_WEBHOOK_SECRET = 'codewihtjoeisthebestplatformwehave'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
