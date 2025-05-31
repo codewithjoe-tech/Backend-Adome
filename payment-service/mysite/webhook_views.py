@@ -16,7 +16,7 @@ import json
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
-
+# codewihtjoeisthebestplatformwehave
 @csrf_exempt
 def webhook(request):
     webhook_secret = settings.RAZORPAY_WEBHOOK_SECRET
