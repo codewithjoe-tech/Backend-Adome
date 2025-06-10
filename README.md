@@ -99,8 +99,8 @@ skaffold version
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/codewithjoe-tech/Backend-Adome.git
+cd BackendAdome
 ```
 
 ### 2. Start Minikube (if not already running)
