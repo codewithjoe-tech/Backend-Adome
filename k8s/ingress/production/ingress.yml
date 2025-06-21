@@ -18,7 +18,7 @@ spec:
   
   tls:
     - hosts:
-        - adome.theadome.xyz
+        - adome.codewithjoe.in
       secretName: adome-theadome-tls
   rules:
     - host: adome.theadome.xyz
