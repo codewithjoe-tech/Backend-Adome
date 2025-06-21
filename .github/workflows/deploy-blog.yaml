@@ -43,7 +43,7 @@ jobs:
         with:
           cluster_name: adome-cluster
           location: asia-south1-a
-          project_id: adome-ms
+          project_id: adome-hobby-123
       - name: Update deployment with new image
         run: |
           kubectl set image deployment/blog blog=joelthomas1103/adome-blog:${{ github.sha }}
