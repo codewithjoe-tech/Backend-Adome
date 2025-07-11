@@ -73,6 +73,7 @@ spec:
             claimName: blog-pvc
 
 ---
+# app-blog name changed to blog
 apiVersion: v1
 kind: Service
 metadata:
