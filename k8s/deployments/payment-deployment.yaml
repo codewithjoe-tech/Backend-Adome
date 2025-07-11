@@ -62,6 +62,11 @@ spec:
                 secretKeyRef:
                   name: secrets
                   key: SECRET_KEY
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DEBUG
           volumeMounts:
             - name: payment-storage
               mountPath: /app/payment_data/

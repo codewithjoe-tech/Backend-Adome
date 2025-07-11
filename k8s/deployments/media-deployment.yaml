@@ -63,6 +63,11 @@ spec:
                 secretKeyRef:
                   name: secrets
                   key: SECRET_KEY
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DEBUG
           volumeMounts:
             - name: media-storage
               mountPath: /app/media_data/

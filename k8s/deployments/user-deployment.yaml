@@ -78,6 +78,11 @@ spec:
                 secretKeyRef:
                   name: secrets
                   key: FRONTEND_URL
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DEBUG
 
           volumeMounts:
             - name: user-storage
