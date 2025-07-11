@@ -13,9 +13,8 @@ import logging
 from  consume_utils import  user_callback , tenant_callback , tenantuser_callback,order_callback
 
 
-
-username = os.getenv('RABBITMQ_DEFAULT_USER')
-password = os.getenv('RABBITMQ_DEFAULT_PASS')
+username = os.getenv('RABBITMQ_DEFAULT_USER' , 'root')
+password = os.getenv('RABBITMQ_DEFAULT_PASS' , 'root')
 
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(
