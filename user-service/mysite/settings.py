@@ -156,7 +156,7 @@ LOGGING = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'community_service',
+        'NAME': 'user_service',
         'USER': os.getenv('DB_NAME' , 'rootuser'),
         'PASSWORD': os.getenv('DB_PASSWORD' , 'rootpassword'),
         'HOST': os.getenv('DB_HOST','roothost'),  
