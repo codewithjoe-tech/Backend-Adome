@@ -8,7 +8,7 @@ spec:
     matchLabels:
       app: rootdb
   strategy:
-    type: Recreate 
+    type: Recreate
   template:
     metadata:
       labels:
@@ -20,12 +20,15 @@ spec:
           env:
             - name: POSTGRES_USER
               value: "root"
-            - name: POSTGRES_PASSWORD
-              value: "root"
             - name: POSTGRES_DB
               value: "root"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: password
             - name: PGDATA
-              value: "/var/lib/postgresql/data/db"  # 👈 tell Postgres to use subdir
+              value: "/var/lib/postgresql/data/db"
           ports:
             - containerPort: 5432
           volumeMounts:
@@ -40,10 +43,7 @@ spec:
         - name: rootdb-storage
           persistentVolumeClaim:
             claimName: rootdb-pvc
-
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

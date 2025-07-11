@@ -8,57 +8,69 @@ spec:
     matchLabels:
       app: webbuilder
   strategy:
-    type: Recreate 
+    type: Recreate
   template:
     metadata:
       labels:
         app: webbuilder
     spec:
-      terminationGracePeriodSeconds: 30 
+      terminationGracePeriodSeconds: 30
       initContainers:
         - name: wait-for-rootdb
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z rootdb 5432; do echo "Waiting for rootdb..."; sleep 2; done']
+          command:
+            - sh
+            - -c
+            - |
+              for i in $(seq 1 60); do
+                if nc -z rootdb 5432; then exit 0; fi
+                echo "Waiting for rootdb..."; sleep 2
+              done
+              exit 1
+
         - name: wait-for-rabbitmq
           image: curlimages/curl:8.5.0
           command:
             - sh
             - -c
-            - >
-              until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
-              do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
+            - |
+              for i in $(seq 1 60); do
+                if curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; then exit 0; fi
+                echo "Waiting for RabbitMQ..."; sleep 2
+              done
+              exit 1
 
-
-       
       containers:
         - name: webbuilder
-          image: joelthomas1103/adome-webbuilder:latest 
+          image: joelthomas1103/adome-webbuilder:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8000  
+            - containerPort: 8000
           env:
             - name: DB_HOST
-              value: "rootdb"  
+              value: "rootdb"
             - name: DB_NAME
               value: "root"
             - name: DB_USER
               value: "root"
             - name: DB_PASSWORD
-              value: "root"
-            - name: SECRET_KEY  # Getting from secret
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DB_PASSWORD
+            - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: secrets
                   key: SECRET_KEY
           volumeMounts:
             - name: webbuilder-storage
-              mountPath: /app/webbuilder_data/  
-      
+              mountPath: /app/webbuilder_data/
+
       volumes:
         - name: webbuilder-storage
           persistentVolumeClaim:
-            claimName:  webbuilder-pvc 
-
+            claimName: webbuilder-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -66,9 +78,9 @@ metadata:
   name: webbuilder-service
 spec:
   selector:
-    app: webbuilder  
+    app: webbuilder
   ports:
     - protocol: TCP
-      port: 8000          
-      targetPort: 8000    
-  type: ClusterIP       
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
