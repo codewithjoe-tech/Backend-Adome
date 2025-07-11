@@ -39,7 +39,7 @@ spec:
                 echo "Waiting for RabbitMQ..."; sleep 2
               done
               exit 1
-
+# Secrets have been changed to kube secrets
       containers:
         - name: payment
           image: joelthomas1103/adome-payment:latest
