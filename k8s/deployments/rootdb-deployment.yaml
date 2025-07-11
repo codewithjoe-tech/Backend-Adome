@@ -26,7 +26,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: secrets
-                  key: password
+                  key: DB_PASSWORD
             - name: PGDATA
               value: "/var/lib/postgresql/data/db"
           ports:
