@@ -48,8 +48,6 @@ jobs:
             --from-literal=FRONTEND_URL="${{ secrets.FRONTEND_URL }}" \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Apply Additional Secrets Manifests
-        run: kubectl apply -f k8s/secrets/
 
       - name: Apply Deployment manifests
         run: kubectl apply -f k8s/deployments/
