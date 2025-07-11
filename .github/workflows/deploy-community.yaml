@@ -2,8 +2,7 @@ name: deploy-community
 on:
   push:
     branches: [main]
-    paths:
-      - 'community-service/**'
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
