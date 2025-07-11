@@ -180,10 +180,10 @@ LOGGING = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'user_service',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'rootdb',  
+        'NAME': 'community_service',
+        'USER': os.getenv('DB_NAME' , 'rootuser'),
+        'PASSWORD': os.getenv('DB_PASSWORD' , 'rootpassword'),
+        'HOST': os.getenv('DB_HOST','roothost'),  
         'PORT': '5432',
     }
 }
