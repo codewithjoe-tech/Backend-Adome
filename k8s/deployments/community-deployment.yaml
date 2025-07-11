@@ -8,60 +8,81 @@ spec:
     matchLabels:
       app: community
   strategy:
-    type: Recreate 
+    type: Recreate
   template:
     metadata:
       labels:
         app: community
-    
     spec:
-
-      terminationGracePeriodSeconds: 30 
+      terminationGracePeriodSeconds: 30
       initContainers:
         - name: wait-for-rootdb
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z rootdb 5432; do echo "Waiting for rootdb..."; sleep 2; done']
+          command:
+            - sh
+            - -c
+            - |
+              for i in $(seq 1 60); do
+                if nc -z rootdb 5432; then exit 0; fi
+                echo "Waiting for rootdb..."; sleep 2
+              done
+              exit 1
+
         - name: wait-for-rabbitmq
           image: curlimages/curl:8.5.0
           command:
             - sh
             - -c
-            - >
-              until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
-              do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
+            - |
+              for i in $(seq 1 60); do
+                if curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; then exit 0; fi
+                echo "Waiting for RabbitMQ..."; sleep 2
+              done
+              exit 1
 
         - name: wait-for-redis
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z redis 6379; do echo "Waiting for Redis..."; sleep 2; done']
+          command:
+            - sh
+            - -c
+            - |
+              for i in $(seq 1 60); do
+                if nc -z redis 6379; then exit 0; fi
+                echo "Waiting for Redis..."; sleep 2
+              done
+              exit 1
 
       containers:
         - name: community
           image: joelthomas1103/adome-community:latest
-          imagePullPolicy: Always 
+          imagePullPolicy: Always
           ports:
-            - containerPort: 8000  
+            - containerPort: 8000
           env:
             - name: DB_HOST
-              value: "rootdb"  
+              value: "rootdb"
             - name: DB_NAME
               value: "root"
             - name: DB_USER
               value: "root"
             - name: DB_PASSWORD
-              value: "root"
-            - name: SECRET_KEY  # Getting from secret
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: DB_PASSWORD
+            - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: secrets
                   key: SECRET_KEY
           volumeMounts:
             - name: community-storage
-              mountPath: /app/community_data/  
+              mountPath: /app/community_data/
 
       volumes:
         - name: community-storage
           persistentVolumeClaim:
-            claimName: community-pvc 
+            claimName: community-pvc
 
 ---
 apiVersion: v1
@@ -70,9 +91,9 @@ metadata:
   name: community-service
 spec:
   selector:
-    app: community  
+    app: community
   ports:
     - protocol: TCP
-      port: 8000          
-      targetPort: 8000    
-  type: ClusterIP       
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

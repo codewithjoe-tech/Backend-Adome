@@ -127,14 +127,13 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'payment_service',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'rootdb',  
+        'NAME': 'community_service',
+        'USER': os.getenv('DB_NAME' , 'rootuser'),
+        'PASSWORD': os.getenv('DB_PASSWORD' , 'rootpassword'),
+        'HOST': os.getenv('DB_HOST','roothost'),  
         'PORT': '5432',
     }
 }

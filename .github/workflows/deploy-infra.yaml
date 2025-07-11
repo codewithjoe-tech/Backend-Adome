@@ -1,4 +1,5 @@
 name: deploy-manifests
+
 on:
   push:
     branches: [main]
@@ -31,13 +32,23 @@ jobs:
 
       - name: Apply PVC manifests
         run: kubectl apply -f k8s/pvc/
-      
-      - name: Apply PVC manifests
-        run: kubectl apply -f k8s/postgres-init-configmap.yml
-      # - name: Apply ConfigMap manifests
-      #       run: kubectl apply -f k8s/configmap/ 
 
-      - name: Apply Secrets manifests
+      - name: Apply Postgres Init ConfigMap
+        run: kubectl apply -f k8s/postgres-init-configmap.yml
+
+      - name: Inject Kubernetes Secrets
+        run: |
+          kubectl create secret generic secrets \
+            --from-literal=SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            --from-literal=DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            --from-literal=RABBITMQ_DEFAULT_USER="${{ secrets.RABBITMQ_DEFAULT_USER }}" \
+            --from-literal=RABBITMQ_DEFAULT_PASS="${{ secrets.RABBITMQ_DEFAULT_PASS }}" \
+            --from-literal=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --from-literal=FRONTEND_URL="${{ secrets.FRONTEND_URL }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply Additional Secrets Manifests
         run: kubectl apply -f k8s/secrets/
 
       - name: Apply Deployment manifests

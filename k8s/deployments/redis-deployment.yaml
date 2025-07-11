@@ -8,23 +8,26 @@ spec:
     matchLabels:
       app: redis
   strategy:
-    type: Recreate 
+    type: Recreate
   template:
     metadata:
       labels:
         app: redis
     spec:
       containers:
-      - name: redis
-        image: redis:latest
-        ports:
-        - containerPort: 6379
-          name: redis
-        readinessProbe:
-          exec:
-            command: ["redis-cli", "ping"]
-          initialDelaySeconds: 10
-          periodSeconds: 5
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+              name: redis
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
       volumes:
         - name: redis-storage
           persistentVolumeClaim:

@@ -137,10 +137,10 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tenant_service',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'rootdb',  
+        'NAME': 'community_service',
+        'USER': os.getenv('DB_NAME' , 'rootuser'),
+        'PASSWORD': os.getenv('DB_PASSWORD' , 'rootpassword'),
+        'HOST': os.getenv('DB_HOST','roothost'),  
         'PORT': '5432',
     }
 }
